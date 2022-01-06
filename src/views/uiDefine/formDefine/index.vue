@@ -1,6 +1,5 @@
 <template>
-  <form-define :config="config"></form-define>
-  {{ config }}
+  <define :config="config"></define>
 </template>
 
 <script lang='jsx'>
@@ -32,6 +31,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<style lang="scss" scoped>
-</style>

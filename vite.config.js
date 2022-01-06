@@ -22,7 +22,40 @@ function pathResolve() {
 export default defineConfig(params => {
   const { command, mode } = params
   const ENV = loadEnv(mode, process.cwd())
+  
   console.info(`--- running mode: ${mode}, command: ${command}, ENV: ${JSON.stringify(ENV)} ---`)
+  
+  if (process.env.FOR_UI_DEFINE) {
+    return {
+      resolve: {
+        extensions: ['.json', '.js', '.vue', '.ts'],
+      },
+      build: {
+        lib: {
+          entry: resolve(__dirname, 'src/components/ui-define/index.js'),
+          name: 'ui-define',
+          fileName: (format) => `ui-define.${format}.js`
+        },
+        outDir: resolve(__dirname, 'src/components/ui-define/dist'),
+        cssCodeSplit: false,
+        rollupOptions: {
+          // 确保外部化处理那些你不想打包进库的依赖
+          external: ['vue'],
+          output: {
+            // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
+            globals: {
+              vue: 'Vue'
+            }
+          }
+        }
+      },
+      plugins: [
+        vue(),
+        vueJsx(),
+      ]
+    }
+  }
+  
   return {
     resolve: {
       extensions: ['.json', '.js', '.vue', '.ts'],

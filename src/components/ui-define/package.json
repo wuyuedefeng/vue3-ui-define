@@ -1,11 +1,19 @@
 {
-  "name": "define-ui",
-  "version": "1.0.0",
+  "name": "ui-define",
+  "version": "0.0.1",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "files": ["dist"],
+  "main": "./dist/ui-define.umd.js",
+  "module": "./dist/ui-define.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/ui-define.es.js",
+      "require": "./dist/ui-define.umd.js"
+    }
+  }
 }

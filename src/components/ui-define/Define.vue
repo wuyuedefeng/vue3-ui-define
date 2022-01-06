@@ -1,5 +1,5 @@
 <template>
-  <component :is="curIs" v-if="curVIf" v-bind="curAttrs">
+  <component :is="curIs" v-if="curVIf" v-show="curVShow" v-bind="curAttrs">
     <slot>
       <template v-for="(child, idx) in (config._children || [])" :key="idx">
         <define :config="child" :parentConfig="curConfig"></define>
@@ -29,11 +29,12 @@ export default defineComponent({
     const state = reactive({
       curIs: computed(() => props.is || props.config._is),
       curVIf: computed(() => typeof state.curConfig['vIf'] === 'function' ? state.curConfig['vIf'].call(state.curConfig) : (state.curConfig['vIf'] === false ? false : true)),
+      curVShow: computed(() => typeof state.curConfig['vShow'] === 'function' ? state.curConfig['vShow'].call(state.curConfig) : (state.curConfig['vShow'] === false ? false : true)),
       curConfig: computed(() => Object.assign(props.config, ctx.attrs, { _getParent: () => props.parentConfig })),
       curAttrs: computed(() => {
         const attrs = {}
         for (const key in state.curConfig) {
-          if (!/^(_|vIf|vModel)/.test(key)) {
+          if (!/^(_|vIf|vShow|vModel)/.test(key)) {
             if (/^on/.test(key) && typeof state.curConfig[key] == 'function') {
               attrs[key] = state.curConfig[key].bind(state.curConfig)
             } else if (/^@/.test(key) && typeof state.curConfig[key] == 'function') {
