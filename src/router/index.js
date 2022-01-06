@@ -4,10 +4,10 @@ import { useLoader } from '@/utils/hooks/useRouterLoader'
 const routes = [
   { path: '/', name: 'Home', component: useLoader(() => import('../views/home')), },
   {
-    path: '/define-ui', name: 'DefineUi', component: useLoader(() => import('../views/defineUi')),
+    path: '/ui-define', name: 'UiDefine', component: useLoader(() => import('../views/uiDefine')),
     children: [
-      { path: '/define-ui/define-form', name: 'DefineUi/DefineForm', component: useLoader(() => import('../views/defineUi/defineForm')) },
-      { path: '/define-ui/define-table', name: 'DefineUi/DefineTable', component: useLoader(() => import('../views/defineUi/defineTable')) }
+      { path: '/ui-define/form-define', name: 'UiDefine/FormDefine', component: useLoader(() => import('../views/uiDefine/formDefine')) },
+      { path: '/ui-define/table-define', name: 'UiDefine/TableDefine', component: useLoader(() => import('../views/uiDefine/tableDefine')) }
     ]
   },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: useLoader(() => import('@/views/notFound')), },

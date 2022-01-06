@@ -1,5 +1,6 @@
 <template>
-  <define-form :config="config"></define-form>
+  <form-define :config="config"></form-define>
+  {{ config }}
 </template>
 
 <script lang='jsx'>
@@ -17,6 +18,11 @@ export default defineComponent({
               { _is: 'a-input', value: '3333', placeholder: '请输入',
                 '@update:value'(nv) { this.value = nv },
               }
+            ]
+          },
+          {
+            _is: 'a-form-item', name: 'bbb', label: 'bbb', _children: [
+              { _is: 'a-input', 'vModel:value': '', placeholder: '请输入'}
             ]
           }
         ]
