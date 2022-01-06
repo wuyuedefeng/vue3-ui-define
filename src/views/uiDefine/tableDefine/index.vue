@@ -1,5 +1,5 @@
 <template>
-  define table
+  table-define
 </template>
 
 <script lang='jsx'>

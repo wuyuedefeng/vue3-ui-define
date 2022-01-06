@@ -1,20 +1,6 @@
-# ui-define
-
-### install 
-```
-npm install --save ui-define
-```
-
-### usage
-```javascript
-import UiDefine from 'ui-define'
-vueApp.use(UiDefine)
-```
-demo 
-
-```vue
 <template>
   <define :config="config"></define>
+  {{ config }}
 </template>
 
 <script lang='jsx'>
@@ -62,20 +48,3 @@ export default defineComponent({
   },
 })
 </script>
-```
-
-> support attrs
-* _is
-* _children
-* _slots
-* _render
-* vModel
-* vIf
-* vShow
-* @event
-
-### support components
-
-* define
-* form-define
-* table-define 

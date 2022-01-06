@@ -7,7 +7,7 @@ import router from './router'
 import store from './store'
 
 import sharedComponents from './components/shared'
-import UiDefine from './components/ui-define'
+import UiDefine from './components/ui-define/index.js'
 import api from './api'
 
 const app = createApp(App)

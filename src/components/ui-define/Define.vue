@@ -1,15 +1,17 @@
 <template>
   <component :is="curIs" v-if="curVIf" v-show="curVShow" v-bind="curAttrs">
-    <slot>
-      <template v-for="(child, idx) in (config._children || [])" :key="idx">
-        <define :config="child" :parentConfig="curConfig"></define>
-      </template>
-    </slot>
+    <template v-if="typeof config._children === 'object'">
+      <slot v-for="(slotName, idx) in Object.keys(config._children)" :key="idx" :name="slotName">
+        <template v-for="(child, idx) in (config._children[slotName])" :key="idx">
+          <define :config="child" :parentConfig="curConfig"></define>
+        </template>
+      </slot>
+    </template>
   </component>
 </template>
 
 <script lang='jsx'>
-import { reactive, toRefs, defineComponent, computed } from 'vue'
+import { reactive, toRefs, defineComponent, computed, h, getCurrentInstance } from 'vue'
 
 export default defineComponent({
   name: 'Define',
@@ -26,11 +28,16 @@ export default defineComponent({
     },
   },
   setup (props, ctx) {
+    const instance = getCurrentInstance()
     const state = reactive({
       curIs: computed(() => props.is || props.config._is),
       curVIf: computed(() => typeof state.curConfig['vIf'] === 'function' ? state.curConfig['vIf'].call(state.curConfig) : (state.curConfig['vIf'] === false ? false : true)),
       curVShow: computed(() => typeof state.curConfig['vShow'] === 'function' ? state.curConfig['vShow'].call(state.curConfig) : (state.curConfig['vShow'] === false ? false : true)),
-      curConfig: computed(() => Object.assign(props.config, ctx.attrs, { _getParent: () => props.parentConfig })),
+      curConfig: computed(() => {
+        const curConfig = Object.assign(props.config, ctx.attrs, { _getParent: () => props.parentConfig })
+        if (curConfig._children instanceof Array) curConfig._children = { default: curConfig._children }
+        return curConfig
+      }),
       curAttrs: computed(() => {
         const attrs = {}
         for (const key in state.curConfig) {
@@ -55,6 +62,18 @@ export default defineComponent({
         return attrs
       })
     })
+
+    if (state.curConfig._render) {
+      return state.curConfig._render.bind(state.curConfig)
+    }
+    if (state.curConfig._slots) {
+      const slots = {}
+      for (const slotName in state.curConfig._slots) {
+        slots[slotName] = state.curConfig._slots[slotName].bind(state.curConfig)
+      }
+      const component = instance.appContext.components[state.curIs] || state.curIs
+      return () => (state.curVIf && state.curVShow) ? h(component, state.curAttrs, slots) : null
+    }
     return { ...toRefs(state) }
   },
 })

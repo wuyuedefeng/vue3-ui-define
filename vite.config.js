@@ -66,7 +66,7 @@ export default defineConfig(params => {
     // https://vitejs.dev/config/#server-options
     server: {
       host: 'localhost',
-      port: 8800,
+      port: 8888,
       // strictPort: false,
       // https: false,
       // open: '/',
