@@ -1,7 +1,6 @@
 <template>
   <a-tabs v-model:activeKey="$route.name" @change="(activeKey) => $router.push({name: activeKey})">
     <a-tab-pane key="UiDefine/Define" tab="Define"></a-tab-pane>
-    <a-tab-pane key="UiDefine/FormDefine" tab="FormDefine"></a-tab-pane>
     <a-tab-pane key="UiDefine/TableDefine" tab="TableDefine"></a-tab-pane>
   </a-tabs>
   <router-view></router-view>

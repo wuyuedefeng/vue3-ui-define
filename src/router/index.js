@@ -7,7 +7,6 @@ const routes = [
     path: '/ui-define', name: 'UiDefine', redirectTo: '/ui-define/define', component: useLoader(() => import('../views/uiDefine')),
     children: [
       { path: '/ui-define/define', name: 'UiDefine/Define', component: useLoader(() => import('../views/uiDefine/define')) },
-      { path: '/ui-define/form-define', name: 'UiDefine/FormDefine', component: useLoader(() => import('../views/uiDefine/formDefine')) },
       { path: '/ui-define/table-define', name: 'UiDefine/TableDefine', component: useLoader(() => import('../views/uiDefine/tableDefine')) }
     ]
   },

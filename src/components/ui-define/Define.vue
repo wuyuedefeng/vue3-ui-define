@@ -1,8 +1,8 @@
 <template>
   <component :is="curIs" v-if="curVIf" v-show="curVShow" v-bind="curAttrs">
     <template v-if="typeof config._children === 'object'">
-      <slot v-for="(slotName, idx) in Object.keys(config._children)" :key="idx" :name="slotName">
-        <template v-for="(child, idx) in (config._children[slotName])" :key="idx">
+      <slot v-for="(slotName, idx) in Object.keys(config._children)" :key="idx" :name="slotName" v-bind="{ config: curConfig, parentConfig }">
+        <template v-for="(child, idx2) in (config._children[slotName])" :key="idx2">
           <define :config="child" :parentConfig="curConfig"></define>
         </template>
       </slot>
@@ -51,7 +51,7 @@ export default defineComponent({
               attrs[key] = state.curConfig[key]
             }
           } else if (/^vModel/.test(key)) {
-            const keys = key.split(':');
+            const keys = key.split(':')
             const key2 = keys.length > 1 ? keys[1] : 'modelValue'
             attrs[key2] = state.curConfig[key]
             attrs[`onUpdate:${key2}`] = (nv) => {
