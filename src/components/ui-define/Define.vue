@@ -31,8 +31,14 @@ export default defineComponent({
     const instance = getCurrentInstance()
     const state = reactive({
       curIs: computed(() => props.is || props.config._is),
-      curVIf: computed(() => typeof state.curConfig['vIf'] === 'function' ? state.curConfig['vIf'].call(state.curConfig) : (state.curConfig['vIf'] === false ? false : true)),
-      curVShow: computed(() => typeof state.curConfig['vShow'] === 'function' ? state.curConfig['vShow'].call(state.curConfig) : (state.curConfig['vShow'] === false ? false : true)),
+      curVIf: computed(() => {
+        const key = Object.prototype.hasOwnProperty.call(state.curConfig, 'v-if') ? 'v-if' : 'vIf'
+        return typeof state.curConfig[key] === 'function' ? state.curConfig[key].call(state.curConfig) : (state.curConfig[key] === false ? false : true)
+      }),
+      curVShow: computed(() => {
+        const key = Object.prototype.hasOwnProperty.call(state.curConfig, 'v-show') ? 'v-show' : 'vShow'
+        return typeof state.curConfig[key] === 'function' ? state.curConfig[key].call(state.curConfig) : (state.curConfig[key] === false ? false : true)
+      }),
       curConfig: computed(() => {
         const curConfig = Object.assign(props.config, ctx.attrs, { _getParent: () => props.parentConfig })
         if (curConfig._children instanceof Array) curConfig._children = { default: curConfig._children }
@@ -41,7 +47,7 @@ export default defineComponent({
       curAttrs: computed(() => {
         const attrs = {}
         for (const key in state.curConfig) {
-          if (!/^(_|vIf|vShow|vModel)/.test(key)) {
+          if (!/^(_|vIf|v-if|vShow|v-show|vModel|v-model)/.test(key)) {
             if (/^on/.test(key) && typeof state.curConfig[key] == 'function') {
               attrs[key] = state.curConfig[key].bind(state.curConfig)
             } else if (/^@/.test(key) && typeof state.curConfig[key] == 'function') {
@@ -50,7 +56,7 @@ export default defineComponent({
             } else {
               attrs[key] = state.curConfig[key]
             }
-          } else if (/^vModel/.test(key)) {
+          } else if (/^(vModel|v-model)/.test(key)) {
             const keys = key.split(':')
             const key2 = keys.length > 1 ? keys[1] : 'modelValue'
             attrs[key2] = state.curConfig[key]

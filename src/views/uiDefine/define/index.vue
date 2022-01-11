@@ -23,9 +23,9 @@ export default defineComponent({
                 value: computed(() => state.config.model.normal),
                 '@update:value'(nv) { state.config.model.normal = nv },
               },
-              { _is: 'a-input', placeholder: '请输入 - self',
-                value: '', '@update:value'(nv) { this.value = nv },
-              },
+              //{ _is: 'a-input', placeholder: '请输入 - self',
+              //  value: '', '@update:value'(nv) { this.value = nv },
+              //},
             ]
           },
           {
@@ -37,7 +37,7 @@ export default defineComponent({
                   set: (nv) => state.config.model.vModel = nv
                 }), placeholder: '请输入 - form model'
               },
-              { _is: 'a-input', 'vModel:value': '', placeholder: '请输入 - self'}
+              //{ _is: 'a-input', 'v-model:value': '', placeholder: '请输入 - self'}
             ]
           },
           {
@@ -45,7 +45,7 @@ export default defineComponent({
               default() {
                 return [
                   <input type="text" v-model={state.config.model.slots} placeholder="请输入 - form model" />,
-                  <input type="text" v-model={this.label} placeholder="请输入 - self" />
+                  //<input type="text" v-model={this.label} placeholder="请输入 - self" />
                 ]
               }
             }
@@ -57,12 +57,12 @@ export default defineComponent({
                   return <input type="text" v-model={state.config.model.render} placeholder="请输入 - form model" />
                 }
               },
-              {
-                value: '', placeholder: '请输入',
-                _render() {
-                  return <input type="text" v-model={this.value} placeholder="请输入 - self" />
-                }
-              }
+              //{
+              //  value: '', placeholder: '请输入',
+              //  _render() {
+              //    return <input type="text" v-model={this.value} placeholder="请输入 - self" />
+              //  }
+              //}
             ]
           },
         ]
