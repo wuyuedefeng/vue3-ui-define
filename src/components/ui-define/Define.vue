@@ -1,8 +1,8 @@
 <template>
   <component :is="curIs" v-if="curVIf" v-show="curVShow" v-bind="curAttrs">
-    <template v-if="typeof config._children === 'object'">
-      <slot v-for="(slotName, idx) in Object.keys(config._children)" :key="idx" :name="slotName" v-bind="{ config: curConfig, parentConfig }">
-        <template v-for="(child, idx2) in (config._children[slotName])" :key="idx2">
+    <template v-if="typeof curChildren === 'object'">
+      <slot v-for="(slotName, idx) in Object.keys(curChildren)" :key="idx" :name="slotName" v-bind="{ config: curConfig, parentConfig }">
+        <template v-for="(child, idx2) in (curChildren[slotName])" :key="idx2">
           <define :config="child" :parentConfig="curConfig"></define>
         </template>
       </slot>
@@ -41,9 +41,10 @@ export default defineComponent({
       }),
       curConfig: computed(() => {
         const curConfig = Object.assign(props.config, ctx.attrs, { _getParent: () => props.parentConfig })
-        if (curConfig._children instanceof Array) curConfig._children = { default: curConfig._children }
+        //if (curConfig._children instanceof Array) curConfig._children = { default: curConfig._children }
         return curConfig
       }),
+      curChildren: computed(() => state.curConfig._children instanceof Array ? { default: state.curConfig._children } : state.curConfig._children),
       curAttrs: computed(() => {
         const attrs = {}
         for (const key in state.curConfig) {
@@ -70,7 +71,7 @@ export default defineComponent({
     })
 
     if (state.curConfig._render) {
-      return state.curConfig._render.bind(state.curConfig)
+      return () => (state.curVIf && state.curVShow) ? state.curConfig._render.bind(state.curConfig)() : null
     }
     if (state.curConfig._slots) {
       const slots = {}
