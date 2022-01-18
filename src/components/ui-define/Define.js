@@ -79,7 +79,7 @@ const Define = defineComponent({
       const slots = this.curChildren ? Object.assign({}, ...Object.keys(this.curChildren).map(slotName => ({
         [slotName]: () => this.curChildren[slotName].map(item => h(Define, {config: item}))
       }))) : {}
-      Object.assign(slots, this.curConfig._slots)
+      Object.assign(slots, this.curConfig._slots, this.$slots)
       const comp = typeof this.curIs === 'string' ? instance.appContext.components[this.curIs] || resolveDynamicComponent(this.curIs) : this.curIs
       return withDirectives(
         h(comp, this.curAttrs, slots),

@@ -1,19 +1,23 @@
 <template>
-  <slot v-bind="{items, pagination, query}">
-    <ui-define :config="config"></ui-define>
-  </slot>
+  <ui-define :config="config">
+    <slot name="searchBar" v-bind="{data, pagination, query, fetchData, refreshData}"></slot>
+    <slot v-bind="{data, pagination, query, fetchData, refreshData}"></slot>
+    <slot name="pagination" v-bind="{data, pagination, query, fetchData, refreshData}"></slot>
+  </ui-define>
 </template>
 
 <script lang='jsx'>
-import { reactive, toRefs, defineComponent } from 'vue'
+import { reactive, toRefs, defineComponent, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useLoading } from './hooks/useLoading'
 
 export default defineComponent({
-  expose: ['refreshTableData', 'fetchData'],
   props: {
     config: [Object],
-    pagination: {
+    query: [Object],
+    data: [Object],
+    pagination: [Object],
+    enablePagination: {
       type: [Boolean, Object],
       default: () => ({
         pageNo: 'pageNo',
@@ -30,33 +34,57 @@ export default defineComponent({
       default: true
     }
   },
-  setup (props, _ctx) {
+  emits: ['update:query', 'update:data', 'update:pagination'],
+  expose: ['refreshData', 'fetchData'],
+  setup (props, ctx) {
     const router = useRouter()
     const route = useRoute()
     const state = reactive({
       fetchLoading: useLoading(),
-      items: [],
-      query: {},
-      pagination: {
-        [props.pagination?.pageNo || 'pageNo']: 1,
-        [props.pagination?.pageSize || 'pageSize']: 10,
-        [props.pagination?.totalCount || 'totalCount']: 0,
+      query: props.query || {},
+      curQuery: computed({
+        get: () => props.query || state.query,
+        set: (nv) => {
+          state.query = nv
+          ctx.emit('update:query', state.query)
+        }
+      }),
+      data: props.data || null,
+      curData: computed({
+        get: () => props.data || state.data,
+        set: (nv) => {
+          state.data = nv
+          ctx.emit('update:data', state.data)
+        }
+      }),
+      pagination: props.pagination || {
+        [props.enablePagination?.pageNo || 'pageNo']: 1,
+        [props.enablePagination?.pageSize || 'pageSize']: 10,
+        [props.enablePagination?.totalCount || 'totalCount']: 0,
       },
-      async refreshTableData() {
-        await state.fetchData(state.query)
+      curPagination: computed({
+        get: () => props.pagination || state.pagination,
+        set: (nv) => {
+          state.pagination = nv
+          ctx.emit('update:pagination', state.pagination)
+        }
+      }),
+      async refreshData(extraQuery = {}) {
+        const query = route.query.q ? JSON.parse(route.query.q) : {}
+        await state.fetchData({...query, ...extraQuery})
       },
-      async fetchData(query = {}) {
+      async fetchData(query = {}, mergeBeforeQuery = true) {
         const queryData = {
-          ...(props.pagination ? {
-            [props.pagination?.pageNo || 'pageNo']: state.pagination[props.pagination?.pageNo || 'pageNo'],
-            [props.pagination?.pageSize || 'pageSize']: state.pagination[props.pagination?.pageSize || 'pageSize']
+          ...(props.enablePagination ? {
+            [props.enablePagination?.pageNo || 'pageNo']: state.pagination[props.enablePagination?.pageNo || 'pageNo'],
+            [props.enablePagination?.pageSize || 'pageSize']: state.pagination[props.enablePagination?.pageSize || 'pageSize']
           } : {}),
-          ...state.query, ...query }
+          ...(mergeBeforeQuery ? state.curQuery : {}), ...query }
         // pagination
-        const {[props.pagination?.pageNo || 'pageNo']: pageNo, [props.pagination?.pageSize || 'pageSize']: pageSize} = queryData
-        Object.assign(state.pagination, {
-          [props.pagination?.pageNo || 'pageNo']: pageNo || state.pagination[props.pagination?.pageNo || 'pageNo'],
-          [props.pagination?.pageSize || 'pageSize']: pageSize || state.pagination[props.pagination?.pageSize || 'pageSize']
+        const {[props.enablePagination?.pageNo || 'pageNo']: pageNo, [props.enablePagination?.pageSize || 'pageSize']: pageSize} = queryData
+        state.curPagination = Object.assign({}, state.curPagination, {
+          [props.enablePagination?.pageNo || 'pageNo']: pageNo || state.pagination[props.enablePagination?.pageNo || 'pageNo'],
+          [props.enablePagination?.pageSize || 'pageSize']: pageSize || state.pagination[props.enablePagination?.pageSize || 'pageSize']
         })
         // query condition
         //for (const key in queryData) {
@@ -64,7 +92,7 @@ export default defineComponent({
         //    delete queryData[key]
         //  }
         //}
-        state.query = queryData
+        state.curQuery = queryData
         // enableUrlQuery
         if (props.enableUrlQuery) {
           await router.replace({query: {q: JSON.stringify(queryData)}})
@@ -72,12 +100,12 @@ export default defineComponent({
         if (props.config._fetchData) {
           await state.fetchLoading.load(async () => {
             await props.config._fetchData(queryData).then((respData) => {
-              state.items = respData.items
-              if (props.pagination) {
-                Object.assign(state.pagination, {
-                  [props.pagination?.pageNo || 'pageNo']: respData[props.pagination?.pageNo || 'pageNo'] || state.pagination[props.pagination?.pageNo || 'pageNo'],
-                  [props.pagination?.pageSize || 'pageSize']: respData[props.pagination?.pageSize || 'pageSize'] || state.pagination[props.pagination?.pageSize || 'pageSize'],
-                  [props.pagination?.totalCount || 'totalCount']: respData[props.pagination?.totalCount || 'totalCount']
+              state.curData = respData.data
+              if (props.enablePagination) {
+                state.curPagination = Object.assign({}, state.curPagination, {
+                  [props.enablePagination?.pageNo || 'pageNo']: respData[props.enablePagination?.pageNo || 'pageNo'] || state.pagination[props.enablePagination?.pageNo || 'pageNo'],
+                  [props.enablePagination?.pageSize || 'pageSize']: respData[props.enablePagination?.pageSize || 'pageSize'] || state.pagination[props.enablePagination?.pageSize || 'pageSize'],
+                  [props.enablePagination?.totalCount || 'totalCount']: respData[props.enablePagination?.totalCount || 'totalCount']
                 })
               }
             })
@@ -87,8 +115,7 @@ export default defineComponent({
     })
 
     if (props.enableFirstAutoFetch) {
-      const query = route.query.q ? JSON.parse(route.query.q) : {}
-      state.fetchData(query)
+      state.refreshData()
     }
     return { ...toRefs(state) }
   },
