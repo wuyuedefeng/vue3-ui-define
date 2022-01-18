@@ -24,6 +24,10 @@ const Define = defineComponent({
         const key = Object.prototype.hasOwnProperty.call(state.curConfig, 'v-show') ? 'v-show' : 'vShow'
         return typeof state.curConfig[key] === 'function' ? state.curConfig[key].call(state.curConfig) : (state.curConfig[key] === false ? false : true)
       }),
+      curDirectives: computed(() => [
+        [vShow, state.curVShow],
+        ...(typeof state.curConfig._directives === 'function' ? state.curConfig._directives.call(state.curConfig) : state.curConfig._directives || []),
+      ]),
       curConfig: computed(() => {
         const curConfig = Object.assign(props.config, ctx.attrs, { _getParent: () => props.parentConfig })
         if (curConfig._slots) {
@@ -67,9 +71,9 @@ const Define = defineComponent({
     const instance = getCurrentInstance()
     if (this.curConfig._render) {
       return this.curVIf ? withDirectives(
-        h(this.curConfig._render.bind(this.curConfig)()), [
-          [vShow, this.curVShow],
-        ]) : null
+        h(this.curConfig._render.bind(this.curConfig)()),
+        this.curDirectives
+      ) : null
     }
     if (this.curVIf) {
       const slots = this.curChildren ? Object.assign({}, ...Object.keys(this.curChildren).map(slotName => ({
@@ -78,9 +82,8 @@ const Define = defineComponent({
       Object.assign(slots, this.curConfig._slots)
       const comp = typeof this.curIs === 'string' ? instance.appContext.components[this.curIs] || resolveDynamicComponent(this.curIs) : this.curIs
       return withDirectives(
-        h(comp, this.curAttrs, slots), [
-          [vShow, this.curVShow],
-        ]
+        h(comp, this.curAttrs, slots),
+        this.curDirectives
       )
     } else {
       return null

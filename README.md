@@ -87,9 +87,10 @@ export default defineComponent({
 
 > support attrs
 * _is
-* _children, `type: Array|Object`, Array auto transform to `{ default: Array }`, key is a slot name
+* _children, `type: Array|Object`, Array auto transform to `{ default: () => Array }`, key is a slot name
 * _slots, `type: Object`, eg: `{ default => <div>child</div> }`
 * _render, `type: Function`
+* _directives, `type: Array|()=>Array`, Pass to [withDirectives](https://v3.cn.vuejs.org/api/global-api.html#withdirectives)
 * v-model|vModel
 * v-if|vIf
 * v-show|vShow
