@@ -86,14 +86,14 @@ export default defineComponent({
 ```
 
 > support attrs
-* _is
+* _is, `type: String|Component|() => String|Component`,
 * _children, `type: Array|Object`, Array auto transform to `{ default: () => Array }`, key is a slot name
 * _slots, `type: Object`, eg: `{ default => <div>child</div> }`
 * _render, `type: Function`
 * _directives, `type: Array|()=>Array`, Pass to [withDirectives](https://v3.cn.vuejs.org/api/global-api.html#withdirectives)
 * v-model|vModel
-* v-if|vIf
-* v-show|vShow
+* v-if|vIf, `type: Boolean|()=>Boolean`
+* v-show|vShow, `type: Boolean|()=>Boolean`
 * @event, `type: Function`, eg: `@update:modelValue(nv) {}`
 
 ---
@@ -102,7 +102,6 @@ export default defineComponent({
 demo
 ```vue
 <template>
-  <a-divider>base</a-divider>
   <ui-table-define ref="tableRef" :config="tableConfig">
     <template #searchBar="{ data, pagination, query, fetchData, refreshData }">
       <div>query: {{ query }}</div>

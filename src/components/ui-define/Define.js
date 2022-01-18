@@ -1,4 +1,4 @@
-import { defineComponent, toRefs, reactive, computed, h, withDirectives, vShow, getCurrentInstance, resolveDynamicComponent } from 'vue'
+import { defineComponent, toRefs, reactive, computed, h, withDirectives, vShow, getCurrentInstance, resolveDynamicComponent, createCommentVNode } from 'vue'
 
 const Define = defineComponent({
   inheritAttrs: false,
@@ -15,7 +15,7 @@ const Define = defineComponent({
   },
   setup(props, ctx) {
     const state = reactive({
-      curIs: computed(() => props.is || props.config._is),
+      curIs: computed(() => props.is || typeof props.config._is === 'function' ? props.config._is.call(state.curConfig) : props.config._is),
       curVIf: computed(() => {
         const key = Object.prototype.hasOwnProperty.call(state.curConfig, 'v-if') ? 'v-if' : 'vIf'
         return typeof state.curConfig[key] === 'function' ? state.curConfig[key].call(state.curConfig) : (state.curConfig[key] === false ? false : true)
@@ -73,7 +73,7 @@ const Define = defineComponent({
       return this.curVIf ? withDirectives(
         h(this.curConfig._render.bind(this.curConfig)()),
         this.curDirectives
-      ) : null
+      ) : createCommentVNode('v-if ui-define', true)
     }
     if (this.curVIf) {
       const slots = this.curChildren ? Object.assign({}, ...Object.keys(this.curChildren).map(slotName => ({
@@ -86,7 +86,7 @@ const Define = defineComponent({
         this.curDirectives
       )
     } else {
-      return null
+      return createCommentVNode('v-if ui-define', true)
     }
   }
 })

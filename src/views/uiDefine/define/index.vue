@@ -68,6 +68,7 @@ export default defineComponent({
               //}
             ]
           },
+          { _is: 'div', vIf: () => false }
         ]
       }
     })
