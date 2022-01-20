@@ -37,7 +37,8 @@ export default defineConfig(params => {
           fileName: (format) => `ui-define.${format}.js`
         },
         outDir: resolve(__dirname, 'src/components/ui-define/dist'),
-        cssCodeSplit: false,
+        // 样式打包到组件同一个文件中
+        cssCodeSplit: true,
         rollupOptions: {
           // 确保外部化处理那些你不想打包进库的依赖
           external: ['vue', 'vue-router'],
