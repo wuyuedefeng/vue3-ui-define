@@ -4,6 +4,7 @@
     <li>model: {{ config.model }}</li>
     <li>config: {{ config }}</li>
   </ul>
+  <button @click="logRef">logRef</button>
 </template>
 
 <script lang='jsx'>
@@ -15,6 +16,7 @@ export default defineComponent({
       formDefineRef: null,
       config: {
         _is: 'AForm',
+        ref: null,
         model: {},
         labelCol: { style: 'width: 100px;' },
         _children: [
@@ -70,7 +72,10 @@ export default defineComponent({
           },
           { _is: 'div', vIf: () => false }
         ]
-      }
+      },
+      logRef() {
+        console.log('ref', state.config.ref)
+      },
     })
     return { ...toRefs(state) }
   },

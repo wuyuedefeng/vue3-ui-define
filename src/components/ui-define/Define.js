@@ -53,7 +53,10 @@ const Define = defineComponent({
                 state.curConfig[key] = nv
               }
             }
-          } else if (/^(on|ref$)/.test(key) && typeof state.curConfig[key] == 'function') {
+          } else if (/^(ref$)/.test(key)) {
+            if (typeof state.curConfig[key] == 'function') attrs[key] = state.curConfig[key].bind(state.curConfig)
+            else attrs[key] = (bindRef) => state.curConfig[key] = bindRef
+          } else if (/^(on)/.test(key) && typeof state.curConfig[key] == 'function') {
             attrs[key] = state.curConfig[key].bind(state.curConfig)
           } else if (/^@/.test(key) && typeof state.curConfig[key] == 'function') {
             const key2  = `on${key.charAt(1).toUpperCase() + key.slice(2)}`
