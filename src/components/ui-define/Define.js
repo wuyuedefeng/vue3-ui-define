@@ -1,4 +1,4 @@
-import { defineComponent, toRefs, reactive, computed, h, withDirectives, vShow, getCurrentInstance, resolveDynamicComponent, createCommentVNode } from 'vue'
+import { defineComponent, toRefs, reactive, computed, h, withDirectives, withModifiers, vShow, getCurrentInstance, resolveDynamicComponent, createCommentVNode } from 'vue'
 
 const Define = defineComponent({
   inheritAttrs: false,
@@ -59,8 +59,9 @@ const Define = defineComponent({
           } else if (/^(on)/.test(key) && typeof state.curConfig[key] == 'function') {
             attrs[key] = state.curConfig[key].bind(state.curConfig)
           } else if (/^@/.test(key) && typeof state.curConfig[key] == 'function') {
-            const key2  = `on${key.charAt(1).toUpperCase() + key.slice(2)}`
-            attrs[key2] = state.curConfig[key].bind(state.curConfig)
+            const key2 = `on${key.charAt(1).toUpperCase() + key.slice(2)}`
+            const [realKey, ...modifiers] = key2.split('.')
+            attrs[realKey] = withModifiers((...args) => state.curConfig[key].bind(state.curConfig)(...args), modifiers)
           } else {
             attrs[key] = state.curConfig[key]
           }

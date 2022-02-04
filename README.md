@@ -7,8 +7,8 @@ npm install --save ui-define
 
 ### usage
 ```javascript
-import UiDefine from 'ui-define'
-vueApp.use(UiDefine)
+import uiDefine from 'ui-define'
+app.use(UiDefine)
 ```
 demo 
 
@@ -94,7 +94,7 @@ export default defineComponent({
 * v-model|vModel
 * v-if|vIf, `type: Boolean|()=>Boolean`
 * v-show|vShow, `type: Boolean|()=>Boolean`
-* @event, `type: Function`, eg: `@update:modelValue(nv) {}`
+* @event, `type: Function`, eg: `@update:modelValue(nv) {}`, support: `withModifiers` eg: '@click.stop'
 
 ---
 ### TableDefine

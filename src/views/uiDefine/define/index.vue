@@ -8,12 +8,16 @@
 </template>
 
 <script lang='jsx'>
-import { reactive, toRefs, defineComponent, computed } from 'vue'
+import { reactive, toRefs, defineComponent, computed, markRaw } from 'vue'
+import { Button } from 'ant-design-vue'
 
 export default defineComponent({
   setup (_props, _ctx) {
     const state = reactive({
       formDefineRef: null,
+      hello() {
+        console.log('onHello', ...arguments)
+      },
       config: {
         _is: 'AForm',
         ref: null,
@@ -56,12 +60,17 @@ export default defineComponent({
             }
           },
           {
-            _is: 'AFormItem', name: 'render', label: 'render', _children: [
+            _is: 'AFormItem', name: 'render', label: 'render', '@click': () => console.log(456), _children: [
               {
                 _render() {
                   return <a-input type="text" v-model:value={state.config.model.render} placeholder="请输入 - form model" />
                 }
               },
+              {
+                _is: markRaw(Button), '@click.stop.prevent': () => state.hello(1, 2, 3), _slots: {
+                  default: () => '提交'
+                }
+              }
               //{
               //  value: '', placeholder: '请输入',
               //  _render() {
