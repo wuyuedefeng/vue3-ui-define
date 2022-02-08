@@ -16,6 +16,7 @@ export function useLoading() {
         } else {
           loadingState.data = executor
         }
+        return loadingState.data
       } finally {
         loadingState.value = false
       }

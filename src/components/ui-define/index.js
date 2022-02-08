@@ -1,8 +1,8 @@
 import Define from './Define'
 import TableDefine from './TableDefine'
 
-export { useLoading } from './hooks/useLoading'
 export { Define, TableDefine }
+export * from './hooks'
 
 export default {
   install(app) {

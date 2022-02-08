@@ -1,15 +1,17 @@
 <template>
   <ui-define :config="config">
-    <slot name="searchBar" v-bind="{data, pagination, query, fetchData, refreshData}"></slot>
-    <slot v-bind="{data, pagination, query, fetchData, refreshData}"></slot>
-    <slot name="pagination" v-bind="{data, pagination, query, fetchData, refreshData}"></slot>
+    <slot name="searchBar" v-bind="{...state}"></slot>
+    <slot v-bind="{...state}"></slot>
+    <template v-if="enablePagination">
+      <slot name="pagination" v-bind="{...state}"></slot>
+    </template>
   </ui-define>
 </template>
 
 <script lang='jsx'>
-import { reactive, toRefs, defineComponent, computed } from 'vue'
+import { toRefs, defineComponent, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useLoading } from './hooks/useLoading'
+import { useState } from './hooks/useState'
 
 export default defineComponent({
   props: {
@@ -39,8 +41,7 @@ export default defineComponent({
   setup (props, ctx) {
     const router = useRouter()
     const route = useRoute()
-    const state = reactive({
-      fetchLoading: useLoading(),
+    const state = useState({
       query: props.query || {},
       curQuery: computed({
         get: () => props.query || state.query,
@@ -70,7 +71,14 @@ export default defineComponent({
         }
       }),
       async refreshData(extraQuery = {}) {
-        const query = route.query.q ? JSON.parse(route.query.q) : {}
+        const query = await new Promise(resolve => {
+          try {
+            resolve(route.query.q && JSON.parse(route.query.q) || {})
+          } catch (e) {
+            console.error(e)
+            resolve({})
+          }
+        })
         await state.fetchData({...query, ...extraQuery})
       },
       async fetchData(query = {}, mergeBeforeQuery = true) {
@@ -88,7 +96,7 @@ export default defineComponent({
         })
         // query condition
         //for (const key in queryData) {
-        //  if ([undefined, null, ''].indexOf(queryData[key]) === -1) {
+        //  if ([undefined, null, ''].indexOf(queryData[key]) !== -1) {
         //    delete queryData[key]
         //  }
         //}
@@ -98,7 +106,7 @@ export default defineComponent({
           await router.replace({query: {q: JSON.stringify(queryData)}})
         }
         if (props.config._fetchData) {
-          await state.fetchLoading.load(async () => {
+          await state.loading.load(async () => {
             await props.config._fetchData(queryData).then((respData) => {
               state.curData = respData.data
               if (props.enablePagination) {
@@ -117,7 +125,10 @@ export default defineComponent({
     if (props.enableFirstAutoFetch) {
       state.refreshData()
     }
-    return { ...toRefs(state) }
+    return {
+      state,
+      ...toRefs(state),
+    }
   },
 })
 </script>
