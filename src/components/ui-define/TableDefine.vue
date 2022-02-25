@@ -32,7 +32,7 @@ export default defineComponent({
       default: true
     },
     enableFirstAutoFetch: {
-      type: Boolean,
+      type: [Boolean, Function],
       default: true
     }
   },
@@ -70,8 +70,8 @@ export default defineComponent({
           ctx.emit('update:pagination', state.pagination)
         }
       }),
-      async refreshData(extraQuery = {}) {
-        const query = await new Promise(resolve => {
+      async getRouteQuery() {
+        return await new Promise(resolve => {
           try {
             resolve(route.query.q && JSON.parse(route.query.q) || {})
           } catch (e) {
@@ -79,6 +79,9 @@ export default defineComponent({
             resolve({})
           }
         })
+      },
+      async refreshData(extraQuery = {}) {
+        const query = await state.getRouteQuery()
         await state.fetchData({...query, ...extraQuery})
       },
       async fetchData(query = {}, mergeBeforeQuery = true) {
@@ -122,9 +125,13 @@ export default defineComponent({
       }
     })
 
-    if (props.enableFirstAutoFetch) {
-      state.refreshData()
-    }
+    state.getRouteQuery().then(q => {
+      state.curQuery = {...state.curQuery, ...q}
+      const enableFirstAutoFetch = typeof props.enableFirstAutoFetch === 'function' ? props.enableFirstAutoFetch({...state.curQuery}) : props.enableFirstAutoFetch
+      if (enableFirstAutoFetch) {
+        state.refreshData()
+      }
+    })
     return {
       state,
       ...toRefs(state),
