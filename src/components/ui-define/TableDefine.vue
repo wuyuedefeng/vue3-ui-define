@@ -73,7 +73,8 @@ export default defineComponent({
       async getRouteQuery() {
         return await new Promise(resolve => {
           try {
-            resolve(route.query.q && JSON.parse(route.query.q) || {})
+            const urlQuery = props.enableUrlQuery ? (route.query.q && JSON.parse(route.query.q) || {}) : state.curQuery
+            resolve(urlQuery)
           } catch (e) {
             console.error(e)
             resolve({})
@@ -82,7 +83,7 @@ export default defineComponent({
       },
       async refreshData(extraQuery = {}) {
         const query = await state.getRouteQuery()
-        await state.fetchData({...query, ...extraQuery})
+        await state.fetchData({...props.query, ...query, ...extraQuery})
       },
       async fetchData(query = {}, mergeBeforeQuery = true) {
         const queryData = {
