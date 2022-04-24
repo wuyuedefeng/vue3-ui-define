@@ -88,8 +88,8 @@ export default defineComponent({
       async fetchData(query = {}, mergeBeforeQuery = true) {
         const queryData = {
           ...(props.enablePagination ? {
-            [props.enablePagination?.pageNo || 'pageNo']: state.pagination[props.enablePagination?.pageNo || 'pageNo'],
-            [props.enablePagination?.pageSize || 'pageSize']: state.pagination[props.enablePagination?.pageSize || 'pageSize']
+            [props.enablePagination?.pageNo || 'pageNo']: query[props.enablePagination?.pageNo || 'pageNo'] || state.pagination[props.enablePagination?.pageNo || 'pageNo'],
+            [props.enablePagination?.pageSize || 'pageSize']: query[props.enablePagination?.pageSize || 'pageSize'] || state.pagination[props.enablePagination?.pageSize || 'pageSize']
           } : {}),
           ...(mergeBeforeQuery ? state.curQuery : {}), ...query }
         // pagination

@@ -1,13 +1,15 @@
 {
   "name": "ui-define",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/ui-define.umd.js",
   "module": "./dist/ui-define.es.js",
   "exports": {
