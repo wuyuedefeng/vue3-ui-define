@@ -42,7 +42,7 @@ export default defineComponent({
     const router = useRouter()
     const route = useRoute()
     const state = useState({
-      query: props.query || {},
+      query: {...props.query},
       curQuery: computed({
         get: () => props.query || state.query,
         set: (nv) => {
