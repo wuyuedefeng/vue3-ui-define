@@ -4,6 +4,7 @@ export function useLoading() {
   const loadingState = reactive({
     value: false,
     data: null,
+    times: 0,
     async load(executor) {
       console.assert(!!executor, '必须传递执行器')
       try {
@@ -16,6 +17,7 @@ export function useLoading() {
         } else {
           loadingState.data = executor
         }
+        this.times++
         return loadingState.data
       } finally {
         loadingState.value = false
